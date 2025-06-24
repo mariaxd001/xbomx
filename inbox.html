@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Registro Médico (Protegido)</title>
+<style>
+  body { font-family: Arial,sans-serif; padding:1rem; background:#f9f9f9; }
+  h1,h2 { background:#004080; color:white; padding:8px; border-radius:4px; }
+  label { display:block; margin:8px 0 2px; font-weight:bold; }
+  input, select, textarea { width:100%; padding:6px; box-sizing:border-box; }
+  .btn { padding:8px 16px; background:#004080; color:white; border:none; border-radius:4px; cursor:pointer; margin:8px 4px 8px 0; }
+  .hidden { display:none; }
+  .patient-card { border:1px solid #ccc; padding:10px; border-radius:4px; margin:8px 0; background:white; }
+  .password-screen { text-align:center; padding:50px; }
+</style>
+</head>
+<body>
+
+<!-- Pantalla contraseña -->
+<div id="passwordScreen" class="password-screen">
+  <h1>🔐 Ingrese la contraseña</h1>
+  <input id="passwordInput" type="password" placeholder="Contraseña" />
+  <button class="btn" onclick="verificarPassword()">Entrar</button>
+  <p id="passwordError" style="color:red; display:none;">❌ Contraseña incorrecta</p>
+</div>
+
+<!-- Menú principal -->
+<div id="menuPrincipal" class="hidden">
+  <button class="btn" onclick="mostrarRegistro()">Registrar paciente</button>
+  <button class="btn" onclick="mostrarLista()">Ver pacientes registrados</button>
+</div>
+
+<!-- Formulario de registro -->
+<form id="registroForm" class="hidden">
+  <h2>🔵 DATOS DEL ESTABLECIMIENTO</h2>
+  <input type="hidden" name="idPaciente" id="idPaciente">
+  <label>Nombre del establecimiento <input name="establecimiento" required></label>
+  <label>Código único (RUC o CLAS) <input name="codigoEstablecimiento" required></label>
+  <label>Fecha y hora de atención <input name="fechaHora" type="datetime-local" required></label>
+  <label>Número historia clínica única <input name="historiaClinica" required></label>
+
+  <h2>🔵 DATOS DEL PACIENTE</h2>
+  <label>Cédula / Pasaporte <input name="cedula" required></label>
+  <label>Apellidos y nombres <input name="nombrePaciente" required></label>
+  <label>Sexo (M/F) <input name="sexo" required></label>
+  <label>Talla <input name="talla" required></label>
+  <label>Peso <input name="peso" required></label>
+  <label>Fecha nacimiento <input name="fechaNacimiento" type="date" required></label>
+  <label>Edad <input name="edad" required></label>
+  <label>Dirección <input name="direccion" required></label>
+  <label>Teléfono <input name="telefono" required></label>
+  <label>Estado civil <input name="estadoCivil" required></label>
+  <label>Con quién vive <input name="conQuienVive" required></label>
+  <label>Tipo de sangre <input name="tipoSangre" required></label>
+  <label>Grupo étnico
+    <select name="grupoEtnico" required>
+      <option value="">Seleccione...</option>
+      <option value="Mestizo">Mestizo</option>
+      <option value="Indígena">Indígena</option>
+      <option value="Afroecuatoriano">Afroecuatoriano</option>
+      <option value="Montubio">Montubio</option>
+      <option value="Blanco">Blanco</option>
+      <option value="Otro">Otro</option>
+    </select>
+  </label>
+
+  <h2>🔵 DATOS DEL RESPONSABLE (SI ES MENOR O INCAPAZ)</h2>
+  <label>Nombre responsable <input name="nombreResponsable"></label>
+  <label>Cédula responsable <input name="cedulaResponsable"></label>
+  <label>Teléfono responsable <input name="telefonoResponsable"></label>
+
+  <h2>🔵 MOTIVO DE CONSULTA Y DIAGNÓSTICO</h2>
+  <label>Motivo consulta <textarea name="motivoConsulta"></textarea></label>
+  <label>¿Cirugía? <input name="cirugia"></label>
+  <label>¿Alergias a medicamentos? <input name="alergias"></label>
+  <label>Diagnóstico presuntivo (CIE-10) <input name="diagnosticoPresuntivo"></label>
+  <label>Diagnóstico definitivo (CIE-10) <input name="diagnosticoDefinitivo"></label>
+  <label>Tratamiento indicado <textarea name="tratamiento"></textarea></label>
+  <label>Observaciones generales <textarea name="observaciones"></textarea></label>
+
+  <h2>🔵 SIGNOS VITALES AL INGRESO</h2>
+  <label>Presión arterial <input name="presionArterial" placeholder="Ej. 120/80 mmHg" required></label>
+  <label>Respiración <input name="respiracion" placeholder="Ej. 18 rpm" required></label>
+  <label>Pulso <input name="pulso" placeholder="Ej. 72 lpm" required></label>
+  <label>Temperatura <input name="temperatura" placeholder="Ej. 36.7°C" required></label>
+
+  <h2>🔵 EXAMEN FÍSICO / LABORATORIO / IMAGENOLOGÍA</h2>
+  <label>Resultados examen físico, laboratorio o imagenología <textarea name="resultadosExamen"></textarea></label>
+
+  <h2>🔵 DIAGNÓSTICOS Y PLAN DE MANEJO</h2>
+  <label>Diagnósticos provisionales y finales <textarea name="diagnosticosFinales"></textarea></label>
+  <label>Plan de manejo y tratamiento administrado <textarea name="planManejo"></textarea></label>
+
+  <h2>🔵 EVOLUCIÓN / ALTA / DERIVACIÓN / FALLECIMIENTO</h2>
+  <label>Evolución, altas, derivación o fallecimiento <textarea name="evolucion"></textarea></label>
+
+  <h2>🔵 PERSONAL QUE ATIENDE</h2>
+  <label>Nombre profesional <input name="nombreProfesional"></label>
+  <label>Cédula profesional <input name="cedulaProfesional"></label>
+  <label>Firma y sello <input name="firmaSello"></label>
+
+  <h2>💡 OTROS</h2>
+  <label>Tipo seguro <input name="tipoSeguro"></label>
+  <label>Servicio que refiere <input name="servicioRefiere"></label>
+  <label>Procedimientos realizados <textarea name="procedimientos"></textarea></label>
+  <label>Medicamentos entregados <textarea name="medicamentos"></textarea></label>
+  <label>Próxima cita o derivación <input name="cita"></label>
+
+  <button class="btn" type="submit">Guardar paciente</button>
+  <button class="btn" type="button" onclick="volverMenu()">Volver al menú</button>
+</form>
+
+<!-- Lista pacientes -->
+<div id="listaPacientes" class="hidden">
+  <h2>Pacientes registrados</h2>
+  <div id="contenedorLista"></div>
+  <button class="btn" onclick="volverMenu()">Volver al menú</button>
+</div>
+
+<!-- Vista ficha paciente individual -->
+<div id="vistaPaciente" class="hidden">
+  <h2>Ficha del paciente</h2>
+  <div id="detallePaciente" style="background:#fff; padding:1rem; border-radius:6px; border:1px solid #ccc;"></div>
+  <button class="btn" onclick="window.location.href = window.location.pathname">Volver a la página principal</button>
+</div>
+
+<script>
+const pacientes = JSON.parse(localStorage.getItem('pacientes')) || [];
+const passwordScreen = document.getElementById('passwordScreen');
+const menuPrincipal = document.getElementById('menuPrincipal');
+const registroForm = document.getElementById('registroForm');
+const listaPacientes = document.getElementById('listaPacientes');
+const contenedorLista = document.getElementById('contenedorLista');
+const vistaPaciente = document.getElementById('vistaPaciente');
+const detallePaciente = document.getElementById('detallePaciente');
+
+function verificarPassword() {
+  if (document.getElementById('passwordInput').value === 'CAPIBARA') {
+    passwordScreen.classList.add('hidden');
+    menuPrincipal.classList.remove('hidden');
+  } else {
+    document.getElementById('passwordError').style.display = 'block';
+  }
+}
+document.getElementById('passwordInput').addEventListener('input',()=>document.getElementById('passwordError').style.display='none');
+
+registroForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(registroForm));
+  if (data.idPaciente) {
+    const index = pacientes.findIndex(p => p.idPaciente === data.idPaciente);
+    if (index > -1) pacientes[index] = data;
+  } else {
+    data.idPaciente = Date.now().toString();
+    pacientes.push(data);
+  }
+  localStorage.setItem('pacientes', JSON.stringify(pacientes));
+  alert(`Paciente guardado.\nLink para compartir:\n${window.location.origin + window.location.pathname}?id=${data.idPaciente}`);
+  registroForm.reset();
+  volverMenu();
+});
+
+function mostrarRegistro(paciente) {
+  menuPrincipal.classList.add('hidden'); listaPacientes.classList.add('hidden'); vistaPaciente.classList.add('hidden'); registroForm.classList.remove('hidden');
+  if (paciente) {
+    for (let k in paciente) if (registroForm.elements[k]) registroForm.elements[k].value = paciente[k];
+  } else {
+    registroForm.reset();
+    registroForm.elements['idPaciente'].value = '';
+  }
+}
+
+function mostrarLista() {
+  menuPrincipal.classList.add('hidden'); registroForm.classList.add('hidden'); vistaPaciente.classList.add('hidden'); listaPacientes.classList.remove('hidden'); contenedorLista.innerHTML='';
+  if (pacientes.length === 0) {
+    contenedorLista.innerHTML = '<p>No hay pacientes registrados.</p>';
+  } else {
+    pacientes.forEach(p => {
+      const div=document.createElement('div');
+      div.classList.add('patient-card');
+      div.innerHTML=`
+        <b>${p.nombrePaciente}</b> (${p.cedula})<br>
+        <button class="btn" onclick='editarPaciente("${p.idPaciente}")'>Editar</button><br>
+        <small>Link: <a href="${window.location.origin+window.location.pathname}?id=${p.idPaciente}" target="_blank">${window.location.origin+window.location.pathname}?id=${p.idPaciente}</a></small>
+      `;
+      contenedorLista.appendChild(div);
+    });
+  }
+}
+
+function editarPaciente(id){ const paciente = pacientes.find(p => p.idPaciente===id); if(paciente) mostrarRegistro(paciente); }
+function volverMenu(){ registroForm.classList.add('hidden'); listaPacientes.classList.add('hidden'); vistaPaciente.classList.add('hidden'); menuPrincipal.classList.remove('hidden'); }
+
+function mostrarPacientePorId(id) {
+  const paciente = pacientes.find(p => p.idPaciente===id);
+  if(!paciente){ alert('Paciente no encontrado'); window.history.replaceState({},'',window.location.pathname); return; }
+  passwordScreen.classList.add('hidden'); menuPrincipal.classList.add('hidden'); registroForm.classList.add('hidden'); listaPacientes.classList.add('hidden'); vistaPaciente.classList.remove('hidden');
+
+  let html='';
+  for(const key in paciente){
+    if(key==='idPaciente') continue;
+    html += `<p><strong>${key}:</strong> ${paciente[key]}</p>`;
+  }
+  detallePaciente.innerHTML=html;
+}
+
+// Al cargar la página, verificar si hay ?id=
+window.onload=()=>{
+  const params=new URLSearchParams(window.location.search);
+  const pacienteId=params.get('id');
+  if(pacienteId){ mostrarPacientePorId(pacienteId); }else{ passwordScreen.classList.remove('hidden'); }
+};
+</script>
+</body>
+</html>
